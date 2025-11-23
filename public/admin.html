@@ -1,0 +1,88 @@
+index.html
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daftar User & API Key</title>
+  <style>
+    body { font-family: 'Segoe UI', sans-serif; background-color: #0f172a; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+    .container { background-color: #1e293b; padding: 40px; border-radius: 12px; width: 90%; max-width: 500px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
+    h1 { color: #818cf8; margin-bottom: 20px; text-align: center; }
+    input, textarea { width: 100%; padding: 12px; margin: 8px 0; border-radius: 6px; border: 1px solid #334155; background-color: #334155; color: white; box-sizing: border-box; }
+    input:focus { outline: 2px solid #6366f1; border-color: transparent; }
+    .btn-group { display: flex; gap: 10px; margin-top: 15px; }
+    button { flex: 1; padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+    .btn-gen { background-color: #f59e0b; color: black; }
+    .btn-gen:hover { background-color: #d97706; }
+    .btn-save { background-color: #4f46e5; color: white; }
+    .btn-save:hover { background-color: #4338ca; }
+    .link-admin { margin-top: 20px; text-align: center; display: block; color: #94a3b8; text-decoration: none; font-size: 0.9em; }
+    .link-admin:hover { color: white; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>🚀 Daftar User API</h1>
+    
+    <label>Nama Depan</label>
+    <input type="text" id="firstName" placeholder="Masukkan nama depan">
+
+    <label>Nama Belakang</label>
+    <input type="text" id="lastName" placeholder="Masukkan nama belakang">
+
+    <label>Email</label>
+    <input type="email" id="email" placeholder="contoh@email.com">
+
+    <label>API Key (Auto Generate)</label>
+    <div style="display: flex; gap: 5px;">
+      <input type="text" id="apikey" readonly placeholder="Klik tombol generate..." style="flex: 2;">
+    </div>
+
+    <div class="btn-group">
+      <button class="btn-gen" id="btnGenerate">⚡ Generate Key</button>
+      <button class="btn-save" id="btnSave">💾 Simpan Data</button>
+    </div>
+
+    <a href="/admin" class="link-admin">Masuk sebagai Admin →</a>
+  </div>
+
+  <script>
+    // 1. Fungsi Generate Key
+    document.getElementById('btnGenerate').addEventListener('click', async () => {
+      const res = await fetch('/api/generate');
+      const data = await res.json();
+      document.getElementById('apikey').value = data.apiKey;
+    });
+
+    // 2. Fungsi Simpan Data
+    document.getElementById('btnSave').addEventListener('click', async () => {
+      const firstName = document.getElementById('firstName').value;
+      const lastName = document.getElementById('lastName').value;
+      const email = document.getElementById('email').value;
+      const apiKey = document.getElementById('apikey').value;
+
+      if(!firstName || !email || !apiKey) {
+        alert("Harap isi semua data dan generate key!");
+        return;
+      }
+
+      const res = await fetch('/api/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ firstName, lastName, email, apiKey })
+      });
+
+      const data = await res.json();
+      if(data.success) {
+        alert('✅ ' + data.message);
+        location.reload(); // Refresh halaman setelah simpan
+      } else {
+        alert('❌ Gagal: ' + data.error);
+      }
+    });
+  </script>
+</body>
+</html>
