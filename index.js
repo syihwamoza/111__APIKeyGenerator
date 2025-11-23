@@ -64,3 +64,29 @@ app.post('/api/users', (req, res) => {
     res.json({ success: true, message: 'Data berhasil disimpan!' });
   });
 });
+// 3. Ambil Semua Data untuk Dashboard (Page 3)
+app.get('/api/users', (req, res) => {
+  const sql = 'SELECT * FROM users ORDER BY id DESC';
+  db.query(sql, (err, results) => {
+    if (err) {
+      return res.status(500).json({ error: 'Gagal mengambil data' });
+    }
+    res.json(results);
+  });
+});
+
+// 4. Hapus Data (Button Delete di Dashboard)
+app.delete('/api/users/:id', (req, res) => {
+  const { id } = req.params;
+  const sql = 'DELETE FROM users WHERE id = ?';
+  db.query(sql, [id], (err, results) => {
+    if (err) {
+      return res.status(500).json({ success: false });
+    }
+    res.json({ success: true });
+  });
+});
+
+app.listen(port, () => {
+  console.log(`🚀 Server jalan di http://localhost:${port}`);
+});
